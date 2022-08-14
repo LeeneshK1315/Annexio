@@ -1,0 +1,192 @@
+﻿@model Annexio.Models.CountriesViewModel
+
+<style type="text/css">
+    button {
+        background: none !important;
+        border: none;
+        padding: 0 !important;
+        font-family: arial, sans-serif;
+        color: #069;
+    }
+
+    button:hover {
+        background: none !important;
+        border: none;
+        padding: 0 !important;
+        font-family: arial, sans-serif;
+        color: #069;
+        text-decoration: underline;
+    }
+
+    .modal-dialog {
+        width: 1200px !important;
+        margin: 30px auto;
+    }
+</style>
+
+<div class="text-left">
+    <h4>
+        Countries of the World
+    </h4>
+    <hr />
+</div>
+
+<table class="table table-striped" id="countriesTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayName("Country")
+            </th>
+            <th>
+                @Html.DisplayName("Region")
+            </th>
+            <th>
+                @Html.DisplayName("Sub Region")
+            </th>
+        </tr>
+    <thead>
+    <tbody></tbody>
+</table>
+
+<div id='countryDetailModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='countryDetailModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div id='regionDetailModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='regionDetailModalContent'></div>
+        </div>
+    </div>
+</div>
+
+<div id='subregionDetailModal' class='modal'>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id='subregionDetailModalContent'></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            $("#countriesTable").DataTable({
+                responsive: true,
+                ajax: {
+                    url: "/api/countries/getCountriesList/",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "name",
+                        render: function (data, type, allCountries) {
+                            return "<a href='javascript:void(0);' class='countryDetail' data-country-id='" + allCountries.alpha3Code + "'>" + allCountries.name + "</a>";
+                        }
+                    },
+                    {
+                        data: "region",
+                        render: function (data, type, allRegions) {
+                            return "<a href='javascript:void(0);' class='regionDetail' data-region-id='" + allRegions.region + "'>" + allRegions.region + "</a>";
+                        }
+                    },
+                    {
+                        data: "subregion",
+                        render: function (data, type, allsubRegions) {
+                            return "<a href='javascript:void(0);' class='subRegionDetail' data-subregion-id='" + allsubRegions.subregion + "'>" + allsubRegions.subregion + "</a>";
+                        }
+                    }
+                ],
+                autoWidth: false
+            });
+
+            var CountryDetailPostBackURL = '/Home/GetCountryDetails';
+            $('body').on('click', '.countryDetail', function () {
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-country-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: CountryDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "alpha3Code": id },
+                    datatype: "json",
+                    success: function (data) {
+                        debugger;
+                        $('#countryDetailModalContent').html(data);
+                        $('#countryDetailModal').modal(options);
+                        $('#countryDetailModal').modal('show');
+
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+
+            $("#closbtn").click(function () {
+                $('#countryDetailModal').modal('hide');
+            });
+
+            var RegionDetailPostBackURL = '/Home/GetRegionDetails';
+            $('body').on('click', '.regionDetail', function () {
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-region-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: RegionDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "region": id },
+                    datatype: "json",
+                    success: function (data) {
+                        debugger;
+                        $('#regionDetailModalContent').html(data);
+                        $('#regionDetailModal').modal(options);
+                        $('#regionDetailModal').modal('show');
+
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+
+            $("#closbtn").click(function () {
+                $('#regionDetailModal').modal('hide');
+            });
+
+            var SubRegionDetailPostBackURL = '/Home/GetSubRegionDetails';
+            $('body').on('click', '.subRegionDetail', function () {
+                var $buttonClicked = $(this);
+                var id = $buttonClicked.attr('data-subregion-id');
+                var options = { "backdrop": "static", keyboard: true };
+                $.ajax({
+                    type: "GET",
+                    url: SubRegionDetailPostBackURL,
+                    contentType: "application/json; charset=utf-8",
+                    data: { "subRegion": id },
+                    datatype: "json",
+                    success: function (data) {
+                        debugger;
+                        $('#subregionDetailModalContent').html(data);
+                        $('#subregionDetailModal').modal(options);
+                        $('#subregionDetailModal').modal('show');
+
+                    },
+                    error: function () {
+                        alert("Dynamic content load failed.");
+                    }
+                });
+            });
+
+            $("#closbtn").click(function () {
+                $('#subregionDetailModal').modal('hide');
+            });
+        });
+    </script>
+}
